@@ -190,10 +190,10 @@ public class BTNavigationDropdownMenu: UIView {
     
     @available(*, deprecated, message="Use init(navigationController:title:items:) instead", renamed="BTNavigationDropdownMenu(navigationController: UINavigationController?, title: String, items: [AnyObject])")
     public convenience init(title: String, items: [AnyObject]) {
-        self.init(navigationController: nil, title: title, items: items)
+        self.init(navigationController: nil, title: title, items: items, vcParentView: nil)
     }
     
-    public init(navigationController: UINavigationController?, title: String, items: [AnyObject]) {
+    public init(navigationController: UINavigationController?, title: String, items: [AnyObject], vcParentView: UIView?) {
         
         // Navigation controller
         if let navigationController = navigationController {
@@ -250,7 +250,7 @@ public class BTNavigationDropdownMenu: UIView {
         self.backgroundView.addGestureRecognizer(backgroundTapRecognizer)
         
         // Init table view
-        self.tableView = BTTableView(frame: CGRectMake(menuWrapperBounds.origin.x, menuWrapperBounds.origin.y + 0.5, menuWrapperBounds.width, menuWrapperBounds.height + 300), items: items, configuration: self.configuration)
+        self.tableView = BTTableView(frame: CGRectMake(menuWrapperBounds.origin.x, menuWrapperBounds.origin.y + 0.5, menuWrapperBounds.width, menuWrapperBounds.height - 15), items: items, configuration: self.configuration)
         
         self.tableView.selectRowAtIndexPathHandler = { (indexPath: Int) -> () in
             self.didSelectItemAtIndexHandler!(indexPath: indexPath)
@@ -269,7 +269,11 @@ public class BTNavigationDropdownMenu: UIView {
         self.menuWrapper.addSubview(self.topSeparator)
         
         // Add Menu View to container view
-        window.addSubview(self.menuWrapper)
+        if let _view = vcParentView {
+            _view.addSubview(self.menuWrapper)
+        } else {
+            window.addSubview(self.menuWrapper)
+        }
         
         // By default, hide menu view
         self.menuWrapper.hidden = true
@@ -290,9 +294,9 @@ public class BTNavigationDropdownMenu: UIView {
         self.menuArrow.center = CGPointMake(CGRectGetMaxX(self.menuTitle.frame) + self.configuration.arrowPadding, self.frame.size.height/2)
     }
     
-    public func show() {
+    public func show(y: CGFloat) {
         if self.isShown == false {
-            self.showMenu()
+            self.showMenu(y)
         }
     }
     
@@ -309,8 +313,8 @@ public class BTNavigationDropdownMenu: UIView {
         self.cellTextLabelColor = self.navigationController?.navigationBar.titleTextAttributes?[NSForegroundColorAttributeName] as? UIColor
     }
     
-    func showMenu() {
-        self.menuWrapper.frame.origin.y = self.navigationController!.navigationBar.frame.maxY
+    func showMenu(y: CGFloat) {
+        self.menuWrapper.frame.origin.y = y//self.navigationController!.navigationBar.frame.maxY
         
         self.isShown = true
         
@@ -393,7 +397,7 @@ public class BTNavigationDropdownMenu: UIView {
     }
     
     func menuButtonTapped(sender: UIButton) {
-        self.isShown == true ? hideMenu() : showMenu()
+        self.isShown == true ? hideMenu() : showMenu(55)
     }
 }
 
